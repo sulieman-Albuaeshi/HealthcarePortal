@@ -1,0 +1,7 @@
+# .NET
+bin/
+obj/
+*.sln
+
+# Visual Studio
+*.vscode
