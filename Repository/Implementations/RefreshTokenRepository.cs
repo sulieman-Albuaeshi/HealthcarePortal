@@ -16,7 +16,7 @@ public class RefreshTokenRepository : IRefreshTokenRepository
 
     public async Task<RefreshToken?> GetByTokenHashAsync(string tokenHash)
     {
-        return await _context.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == tokenHash && t.RevokedAt == null && t.ExpiresAt > DateTime.Now);
+        return await _context.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == tokenHash && t.RevokedAt == null && t.ExpiresAt < DateTime.Now);
     }
 
     public async Task<IEnumerable<RefreshToken>> GetByUserIdAsync(Guid userId)
