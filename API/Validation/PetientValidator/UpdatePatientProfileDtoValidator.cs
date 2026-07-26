@@ -30,5 +30,6 @@ public class UpdatePatientProfileDtoValidator : AbstractValidator<UpdatePatientP
         RuleFor(x => x.EmergencyContact)
             .MaximumLength(200).WithMessage("Emergency contact must not exceed 200 characters")
             .When(x => !string.IsNullOrEmpty(x.EmergencyContact));
+        RuleFor(x => x.user).SetValidator(new UpdateUserDtoValidator()).When(x => x.user != null);
     }
 }

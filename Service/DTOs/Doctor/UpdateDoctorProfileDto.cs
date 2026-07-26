@@ -8,4 +8,5 @@ public class UpdateDoctorProfileDto
     public string Specialization { get; set; } = null!;
     public string LicenseNumber { get; set; } = null!;
     public bool IsDeleted { get; set; }
+    public UpdateUserDto user { get; set; } = null!;
 }

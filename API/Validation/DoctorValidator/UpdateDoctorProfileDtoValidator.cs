@@ -25,5 +25,7 @@ public class UpdateDoctorProfileDtoValidator : AbstractValidator<UpdateDoctorPro
         RuleFor(x => x.LicenseNumber)
             .NotEmpty().WithMessage("License number is required")
             .MaximumLength(100).WithMessage("License number must not exceed 100 characters");
+        RuleFor(x => x.user).SetValidator(new UpdateUserDtoValidator()).When(x => x.user != null);
+        
     }
 }
