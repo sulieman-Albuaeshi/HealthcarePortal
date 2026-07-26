@@ -9,6 +9,9 @@ using Repository.Implementations;
 using Service.Interfaces;
 using Service.Implementations;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authorization;
+using API.Authorization;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -80,6 +83,7 @@ builder.Services.AddAuthentication(options =>
 
 // Add services to the container.
 
+builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -133,6 +137,9 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+
+builder.Services.AddSingleton<IAuthorizationHandler, OwnResourceHandler>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -144,6 +151,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
