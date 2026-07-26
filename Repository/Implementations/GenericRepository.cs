@@ -19,12 +19,6 @@ public abstract class GenericRepository<T> : IGenericRepository<T> where T : cla
     {
         return await _dbSet.FindAsync(id);
     }
-
-    public virtual async Task<IEnumerable<T>> GetAllAsync()
-    {
-        return await _dbSet.AsNoTracking().ToListAsync();
-    }
-    
     public virtual async Task<IEnumerable<T>> GetAllAsync(int pageNumber, int pageSize)
     {
         var skip = (pageNumber - 1) * pageSize;

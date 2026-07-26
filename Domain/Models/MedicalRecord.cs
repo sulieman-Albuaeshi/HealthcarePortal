@@ -16,8 +16,6 @@ public partial class MedicalRecord
 
     public RecordType Type { get; set; }
 
-    public DateTime RecordDate { get; set; }
-
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
