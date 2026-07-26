@@ -18,6 +18,32 @@ public static class PatientProfileMappingExtensions
         };
     }
 
+    public static PatientWithAppointmentsDto ToPatientWithAppointmentsDto(this PatientProfile dto)
+    {
+        return new PatientWithAppointmentsDto
+        {
+            Id = dto.Id,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            DateOfBirth = dto.DateOfBirth,
+            PhoneNumber = dto.PhoneNumber,
+            EmergencyContact = dto.EmergencyContact,
+            Appointments = dto.Appointments.Select(a => a.ToDto()).ToList()
+        };
+    }
+    public static PatientWithMedicalRecordDto ToPatientWithMedicalRecordDto(this PatientProfile dto)
+    {   
+        return new PatientWithMedicalRecordDto
+        {
+            Id = dto.Id,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            DateOfBirth = dto.DateOfBirth,
+            PhoneNumber = dto.PhoneNumber,
+            EmergencyContact = dto.EmergencyContact,
+            MedicalRecords = dto.MedicalRecords.Select(m => m.ToDto()).ToList()
+        };
+    }
     public static PatientProfile ToEntity(this CreatePatientProfileDto dto)
     {
         return new PatientProfile

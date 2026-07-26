@@ -10,6 +10,7 @@ public interface IPatientProfileService
     Task<PatientProfileDto?> UpdateAsync(UpdatePatientProfileDto dto);
     Task DeleteAsync(Guid id);
     Task<PatientProfileDto?> GetByUserIdAsync(Guid userId);
-    Task<PatientProfileDto?> GetWithAppointmentsAsync(Guid id);
-    Task<PatientProfileDto?> GetWithMedicalRecordsAsync(Guid id);
+    Task<PatientWithAppointmentsDto?> GetWithAppointmentsAsync(Guid id);
+    Task<PatientWithMedicalRecordDto?> GetWithMedicalRecordsAsync(Guid id);
+    Task<Guid> GetUserIDByPatientIdAsync(Guid patientProfileId);
 }

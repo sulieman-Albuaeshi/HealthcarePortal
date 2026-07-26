@@ -28,4 +28,14 @@ public class PatientProfileRepository : GenericRepository<PatientProfile>, IPati
             .Include(p => p.MedicalRecords)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
+
+    public async Task<Guid> GetUserIDByPatientIdAsync(Guid patientProfileId)
+    {
+        var patientProfile = await _dbSet.FirstOrDefaultAsync(p => p.Id == patientProfileId);
+        if (patientProfile == null)
+        {
+            throw new KeyNotFoundException($"Patient profile with ID {patientProfileId} not found.");
+        }
+        return patientProfile.UserId;
+    }
 }
