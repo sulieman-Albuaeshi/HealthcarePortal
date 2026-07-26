@@ -1,4 +1,5 @@
 using Domain.Models;
+using Microsoft.Identity.Client;
 using Service.DTOs;
 
 namespace Service.Extensions;
@@ -26,6 +27,31 @@ public static class DoctorProfileMappingExtensions
             Specialization = dto.Specialization,
             LicenseNumber = dto.LicenseNumber,
             IsDeleted = false
+        };
+    }
+    public static DoctorWithAppointmentDto ToDoctorWithAppointmentDto(this DoctorProfile dto)
+    {
+        return new DoctorWithAppointmentDto
+        {
+            Id = dto.Id,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Specialization = dto.Specialization,
+            LicenseNumber = dto.LicenseNumber,
+            Appointments = dto.Appointments.Select(a => a.ToDto()).ToList()
+        };
+    }
+
+    public static DoctorWithMedicalRecordDto ToDoctorWithMedicalRecordDto(this DoctorProfile dto)
+    {
+        return new DoctorWithMedicalRecordDto
+        {
+            Id = dto.Id,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Specialization = dto.Specialization,
+            LicenseNumber = dto.LicenseNumber,
+            MedicalRecords = dto.MedicalRecords.Select(m => m.ToDto()).ToList()
         };
     }
     public static void PatchValuesFrom(this UpdateDoctorProfileDto dto, DoctorProfile entity)

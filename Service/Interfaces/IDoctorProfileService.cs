@@ -10,8 +10,8 @@ public interface IDoctorProfileService
     Task<DoctorProfileDto?> UpdateAsync(UpdateDoctorProfileDto dto);
     Task DeleteAsync(Guid id);
     Task<DoctorProfileDto?> GetByUserIdAsync(Guid userId);
-    Task<DoctorProfileDto?> GetWithAppointmentsAsync(Guid id);
-    Task<DoctorProfileDto?> GetWithMedicalRecordsAsync(Guid id);
+    Task<DoctorWithAppointmentDto?> GetWithAppointmentsAsync(Guid id);
+    Task<DoctorWithMedicalRecordDto?> GetWithMedicalRecordsAsync(Guid id);
     Task<IEnumerable<DoctorProfileDto>> GetBySpecializationAsync(string specialization);
     Task<Guid> GetUserIDByDoctorIdAsync(Guid doctorProfileId);
 }

@@ -58,16 +58,16 @@ public class DoctorProfileService : IDoctorProfileService
         return profile?.ToDto();
     }
 
-    public async Task<DoctorProfileDto?> GetWithAppointmentsAsync(Guid id)
+    public async Task<DoctorWithAppointmentDto?> GetWithAppointmentsAsync(Guid id)
     {
         var profile = await _doctorProfileRepository.GetWithAppointmentsAsync(id);
-        return profile?.ToDto();
+        return profile?.ToDoctorWithAppointmentDto();
     }
 
-    public async Task<DoctorProfileDto?> GetWithMedicalRecordsAsync(Guid id)
+    public async Task<DoctorWithMedicalRecordDto?> GetWithMedicalRecordsAsync(Guid id)
     {
         var profile = await _doctorProfileRepository.GetWithMedicalRecordsAsync(id);
-        return profile?.ToDto();
+        return profile?.ToDoctorWithMedicalRecordDto();
     }
 
     public async Task<IEnumerable<DoctorProfileDto>> GetBySpecializationAsync(string specialization)
