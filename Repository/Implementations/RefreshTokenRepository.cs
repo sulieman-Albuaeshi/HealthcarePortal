@@ -65,5 +65,6 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     public async Task AddAsync(RefreshToken token)
     {
         await  _context.RefreshTokens.AddAsync(token);
+        await _context.SaveChangesAsync();
     }
 }

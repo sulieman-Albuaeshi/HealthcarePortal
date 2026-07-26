@@ -13,4 +13,5 @@ public interface IDoctorProfileService
     Task<DoctorProfileDto?> GetWithAppointmentsAsync(Guid id);
     Task<DoctorProfileDto?> GetWithMedicalRecordsAsync(Guid id);
     Task<IEnumerable<DoctorProfileDto>> GetBySpecializationAsync(string specialization);
+    Task<Guid> GetUserIDByDoctorIdAsync(Guid doctorProfileId);
 }

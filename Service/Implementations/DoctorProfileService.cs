@@ -75,4 +75,9 @@ public class DoctorProfileService : IDoctorProfileService
         var profiles = await _doctorProfileRepository.GetBySpecializationAsync(specialization);
         return profiles.Select(p => p.ToDto());
     }
+
+    public async Task<Guid> GetUserIDByDoctorIdAsync(Guid doctorProfileId)
+    {
+        return await _doctorProfileRepository.GetUserIDByDoctorIdAsync(doctorProfileId);
+    }
 }

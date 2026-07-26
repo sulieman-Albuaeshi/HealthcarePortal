@@ -35,4 +35,14 @@ public class DoctorProfileRepository : GenericRepository<DoctorProfile>, IDoctor
             .Where(d => d.Specialization == specialization)
             .ToListAsync();
     }
+
+    public async Task<Guid> GetUserIDByDoctorIdAsync(Guid doctorProfileId)
+    {
+        var doctorProfile = await _dbSet.FirstOrDefaultAsync(d => d.Id == doctorProfileId);
+        if (doctorProfile == null)
+        {
+            throw new InvalidOperationException($"Doctor profile with ID {doctorProfileId} not found.");
+        }
+        return doctorProfile.UserId;
+    }
 }
