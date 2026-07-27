@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
 using System.Linq.Expressions;
+using Domain.Interface;
 
 namespace Repository.Implementations;
 
@@ -48,16 +49,22 @@ public abstract class GenericRepository<T> : IGenericRepository<T> where T : cla
 
     public virtual async Task DeleteAsync(T entity)
     {
-        _dbSet.Remove(entity);
+        if(entity is ISoftDeletable softDeletableEntity)
+        {
+            softDeletableEntity.IsDeleted = true;
+            _dbSet.Update(entity);
+        }
+        else
+        {
+            _dbSet.Remove(entity);
+        }
     }
 
     public virtual async Task DeleteAsync(Guid id)
     {
         var entity = await GetByIdAsync(id);
         if (entity != null)
-        {
             await DeleteAsync(entity);
-        }
     }
 
     public async Task<int> SaveChangesAsync()

@@ -1,8 +1,8 @@
 ﻿using Domain.Enums;
-
+using Domain.Interface;
 namespace Domain.Models;
 
-public partial class MedicalRecord
+public partial class MedicalRecord : ISoftDeletable
 {
     public Guid Id { get; set; }
 

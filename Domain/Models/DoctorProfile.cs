@@ -1,8 +1,10 @@
 ﻿using System;
+using Domain.Interface;
+
 
 namespace Domain.Models;
 
-public partial class DoctorProfile
+public partial class DoctorProfile : ISoftDeletable
 {
     public Guid Id { get; set; }
 

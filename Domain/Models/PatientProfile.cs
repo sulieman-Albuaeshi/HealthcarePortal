@@ -1,6 +1,7 @@
 ﻿namespace Domain.Models;
+using Domain.Interface;
 
-public partial class PatientProfile
+public partial class PatientProfile : ISoftDeletable
 {
     public Guid Id { get; set; }
 

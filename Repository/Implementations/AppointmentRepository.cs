@@ -40,7 +40,7 @@ public class AppointmentRepository : GenericRepository<Appointment>, IAppointmen
     public async Task<IEnumerable<Appointment>> GetUpcomingAppointmentsAsync()
     {
         return await _dbSet
-            .Where(a => a.ScheduledAt > DateTime.Now && !a.IsDelete)
+            .Where(a => a.ScheduledAt > DateTime.Now)
             .Include(a => a.Doctor)
             .Include(a => a.Patient)
             .ToListAsync();

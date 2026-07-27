@@ -59,6 +59,7 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK_Appointments_PatientProfiles");
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.Appointments).HasForeignKey(d => d.UpdatedBy);
+            entity.HasQueryFilter(e => !e.IsDeleted);
         });
 
         modelBuilder.Entity<AuditLog>(entity =>
@@ -92,6 +93,7 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.User).WithOne(p => p.DoctorProfile)
                 .HasForeignKey<DoctorProfile>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasQueryFilter(e => !e.IsDeleted);
         });
 
         modelBuilder.Entity<MedicalRecord>(entity =>
@@ -109,6 +111,7 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Patient).WithMany(p => p.MedicalRecords)
                 .HasForeignKey(d => d.PatientId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+                entity.HasQueryFilter(e => !e.IsDeleted);
         });
 
         modelBuilder.Entity<PatientProfile>(entity =>
@@ -124,6 +127,8 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.User).WithOne(p => p.PatientProfile)
                 .HasForeignKey<PatientProfile>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasQueryFilter(e => !e.IsDeleted);
+
         });
 
         modelBuilder.Entity<RefreshToken>(entity =>
@@ -160,7 +165,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PasswordHash).HasMaxLength(256);
             entity.Property(e => e.Role).HasMaxLength(50);
         });
-
         OnModelCreatingPartial(modelBuilder);
     }
 
