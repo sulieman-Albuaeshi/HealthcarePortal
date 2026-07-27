@@ -2,15 +2,16 @@ using Microsoft.EntityFrameworkCore;
 using Repository.Interfaces;
 using System.Linq.Expressions;
 using Domain.Interface;
+using Repository.Data;
 
 namespace Repository.Implementations;
 
 public abstract class GenericRepository<T> : IGenericRepository<T> where T : class
 {
-    protected readonly DbContext _context;
+    protected readonly AppDbContext _context;
     protected readonly DbSet<T> _dbSet;
 
-    public GenericRepository(DbContext context)
+    public GenericRepository(AppDbContext context)
     {
         _context = context;
         _dbSet = context.Set<T>();

@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using Repository.Interfaces;
+using Repository.Data;
 
 namespace Repository.Implementations;
 
 public class AppointmentRepository : GenericRepository<Appointment>, IAppointmentRepository
 {
-    public AppointmentRepository(DbContext context) : base(context)
+    public AppointmentRepository(AppDbContext context) : base(context)
     {
     }
 

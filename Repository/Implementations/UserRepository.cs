@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using Repository.Interfaces;
+using Repository.Data;
 
 namespace Repository.Implementations;
 
 public class UserRepository : GenericRepository<User>, IUserRepository
 {
-    public UserRepository(DbContext context) : base(context)
+    public UserRepository(AppDbContext context) : base(context)
     {
     }
 

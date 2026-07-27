@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Domain.Models;
 using Repository.Interfaces;
+using Repository.Data;
 
 namespace Repository.Implementations;
 
 public class PatientProfileRepository : GenericRepository<PatientProfile>, IPatientProfileRepository
 {
-    public PatientProfileRepository(DbContext context) : base(context)
+    public PatientProfileRepository(AppDbContext context) : base(context)
     {
     }
 

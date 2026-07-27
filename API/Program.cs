@@ -36,7 +36,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ==========================================
 // 2. CONFIGURE DEPENDENCY INJECTION
 // ==========================================
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped(typeof(IAppointmentRepository), typeof(AppointmentRepository));
 builder.Services.AddScoped(typeof(IAuditLogRepository), typeof(AuditLogRepository));
 builder.Services.AddScoped(typeof(IDoctorProfileRepository), typeof(DoctorProfileRepository));
