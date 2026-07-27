@@ -81,4 +81,29 @@ public class AuthController : ControllerBase
             return StatusCode(501, new { Message = "Logout is not yet implemented" });
         }
     }
+
+    [HttpPost("register-patient")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<TokenDto>> RegisterPatient([FromBody] RegisterPatientDto dto)
+    {
+        var token = await _authService.RegisterPatientAsync(dto);
+        if (token == null)
+            return BadRequest(new { Message = "Email is already registered" });
+
+        return Ok(token);
+    }
+
+    [HttpPost("register-doctor")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<TokenDto>> RegisterDoctor([FromBody] RegisterDoctorDto dto)
+    {
+        var token = await _authService.RegisterDoctorAsync(dto);
+        if (token == null)
+            return BadRequest(new { Message = "Email is already registered" });
+
+        return Ok(token);
+    }
 }

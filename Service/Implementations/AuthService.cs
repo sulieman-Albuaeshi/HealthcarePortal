@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Domain.Models;
+using Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
 
@@ -16,12 +17,21 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly IDoctorProfileRepository _doctorProfileRepository;
+    private readonly IPatientProfileRepository _patientProfileRepository;
     private readonly IConfiguration _config;
 
-    public AuthService(IUserRepository userService, IRefreshTokenRepository refreshTokenService, IConfiguration config)
+    public AuthService(
+        IUserRepository userRepository,
+        IRefreshTokenRepository refreshTokenRepository,
+        IDoctorProfileRepository doctorProfileRepository,
+        IPatientProfileRepository patientProfileRepository,
+        IConfiguration config)
     {
-        _userRepository = userService;
-        _refreshTokenRepository = refreshTokenService;
+        _userRepository = userRepository;
+        _refreshTokenRepository = refreshTokenRepository;
+        _doctorProfileRepository = doctorProfileRepository;
+        _patientProfileRepository = patientProfileRepository;
         _config = config;
     }
 
@@ -55,13 +65,8 @@ public class AuthService : IAuthService
         return Convert.ToBase64String(randomNumber);;
     }
 
-    public async Task<TokenDto?> Login(LoginDto userLoginDto)
+    private async Task<TokenDto> GenerateTokensForUserAsync(User user)
     {
-        var user = await _userRepository.GetByEmailAsync(userLoginDto.Email);
-
-        if (user == null || !BCrypt.Net.BCrypt.Verify(userLoginDto.Password, user.PasswordHash))
-            throw new UnauthorizedAccessException("Invalid credentials");
-            
         var AccessToken = GenerateJwtToken(user);
         var refreshToken = GenerateRefreshToken();
         var refreshTokenHash = BCrypt.Net.BCrypt.HashPassword(refreshToken);
@@ -83,6 +88,15 @@ public class AuthService : IAuthService
             AccessToken = AccessToken,
             RefreshToken = refreshToken
         };
+    }
+    public async Task<TokenDto?> Login(LoginDto userLoginDto)
+    {
+        var user = await _userRepository.GetByEmailAsync(userLoginDto.Email);
+
+        if (user == null || !BCrypt.Net.BCrypt.Verify(userLoginDto.Password, user.PasswordHash))
+            throw new UnauthorizedAccessException("Invalid credentials");
+            
+        return await GenerateTokensForUserAsync(user);
     }
 
     public Task<bool?> Logout(Guid userId, string refreshToken)
@@ -123,5 +137,94 @@ public class AuthService : IAuthService
             AccessToken = accessToken,
             RefreshToken = RefreshToken
         };
+    }
+
+    public async Task<TokenDto?> RegisterPatientAsync(RegisterPatientDto dto)
+    {
+        // Check if email is already registered
+        var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
+        
+        // Hash the password
+        if (existingUser == null)
+        {
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);        
+            // Create the user
+            existingUser = new User
+            {
+                Email = dto.Email,
+                PasswordHash = passwordHash,
+                Role = UserRole.Patient,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+            };
+            await _userRepository.AddAsync(existingUser);
+        }
+        else 
+        {
+            if (existingUser.Role == UserRole.Doctor)
+            {
+                existingUser.Role = UserRole.PatientAndDoctor;
+                await _userRepository.UpdateAsync(existingUser);
+            }
+            else if (existingUser.Role == UserRole.PatientAndDoctor || existingUser.Role == UserRole.Patient)
+            {   
+                // User ALREADY has a patient profile
+                return null;
+            }
+        }
+
+        // Create the patient profile
+        var patientProfile = new PatientProfile
+        {
+            UserId = existingUser.Id,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            DateOfBirth = dto.DateOfBirth,
+            PhoneNumber = dto.PhoneNumber,
+            EmergencyContact = dto.EmergencyContact,
+            IsDeleted = false,
+        };
+
+        await _patientProfileRepository.AddAsync(patientProfile);
+        await _patientProfileRepository.SaveChangesAsync();
+        return  await GenerateTokensForUserAsync(existingUser);
+    }
+
+    public async Task<TokenDto?> RegisterDoctorAsync(RegisterDoctorDto dto)
+    {
+        // Check if email is already registered
+        var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
+        if (existingUser != null)
+            return null;
+
+        // Hash the password
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
+        // Create the user
+        var user = new User
+        {
+            Email = dto.Email,
+            PasswordHash = passwordHash,
+            Role = UserRole.Doctor,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+        };
+
+        await _userRepository.AddAsync(user);
+
+        // Create the doctor profile
+        var doctorProfile = new DoctorProfile
+        {
+            UserId = user.Id,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Specialization = dto.Specialization,
+            LicenseNumber = dto.LicenseNumber,
+            IsDeleted = false,
+        };
+
+        await _doctorProfileRepository.AddAsync(doctorProfile);
+        await _doctorProfileRepository.SaveChangesAsync();
+        return await GenerateTokensForUserAsync(user);
     }
 }
