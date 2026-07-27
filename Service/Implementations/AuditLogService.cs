@@ -31,22 +31,7 @@ public class AuditLogService : IAuditLogService
     {
         var entity = dto.ToEntity();
         await _auditLogRepository.AddAsync(entity);
-        await _auditLogRepository.SaveChangesAsync();
         return entity.ToDto();
-    }
-
-    public async Task<AuditLogDto?> UpdateAsync(AuditLogDto dto)
-    {
-        var entity = dto.ToEntity();
-        await _auditLogRepository.UpdateAsync(entity);
-        await _auditLogRepository.SaveChangesAsync();
-        return entity.ToDto();
-    }
-
-    public async Task DeleteAsync(Guid id)
-    {
-        await _auditLogRepository.DeleteAsync(id);
-        await _auditLogRepository.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<AuditLogDto>> GetByUserIdAsync(Guid userId)

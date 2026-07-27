@@ -32,7 +32,7 @@ public static class AppointmentMappingExtensions
             Status = dto.Status,
             Notes = dto.Notes,
             ScheduledAt = dto.ScheduledAt,
-            IsDelete = false,
+            IsDeleted = false,
             CreatedAt = DateTime.UtcNow
         };
     }
@@ -60,7 +60,7 @@ public static class AppointmentMappingExtensions
         if (dto.UpdatedBy != entity.UpdatedBy)
             entity.UpdatedBy = dto.UpdatedBy;
 
-        if (dto.IsDelete.HasValue && dto.IsDelete.Value != entity.IsDelete)
-            entity.IsDelete = dto.IsDelete.Value;
+        if (dto.IsDelete.HasValue && dto.IsDelete.Value != entity.IsDeleted)
+            entity.IsDeleted = dto.IsDelete.Value;
     }
 }
