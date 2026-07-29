@@ -16,7 +16,9 @@ public class RefreshTokenRepository : IRefreshTokenRepository
 
     public async Task<RefreshToken?> GetByTokenHashAsync(string tokenHash)
     {
-        return await _context.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == tokenHash && t.RevokedAt == null && t.ExpiresAt < DateTime.Now);
+        return await _context.RefreshTokens
+        .Include(t => t.User)
+        .FirstOrDefaultAsync(t => t.TokenHash == tokenHash);
     }
 
     public async Task<IEnumerable<RefreshToken>> GetByUserIdAsync(Guid userId)
@@ -35,27 +37,23 @@ public class RefreshTokenRepository : IRefreshTokenRepository
             .ToListAsync();
     }
 
-    public async Task RevokeTokenAsync(Guid tokenId, Guid? replacedByTokenId = null)
+    public async Task RevokeTokenAsync(RefreshToken token, Guid? replacedByTokenId = null)
     {
-        var token = await  _context.RefreshTokens.FindAsync(tokenId);
         if (token != null)
         {
             token.TokenHash = null;
             token.RevokedAt = DateTime.Now;
             token.ReplacedByTokenId = replacedByTokenId;
-            await _context.SaveChangesAsync();
         }
     }
 
-    public async Task<int> RevokeTokenFamilyIfOld(Guid tokenRootId)
+    public async Task<int> RevokeTokenFamilyIfOld(Guid tokenRootUserId) 
     {
-        var targetToken = await  _context.RefreshTokens.Where(t => t.Id == tokenRootId && t.ReplacedByTokenId != null).FirstOrDefaultAsync();
-
-        if (targetToken == null)
+        if (tokenRootUserId == Guid.Empty)
             return 0;
 
         return await  _context.RefreshTokens
-            .Where(t => t.UserId == targetToken.UserId && t.RevokedAt == null)
+            .Where(t => t.UserId == tokenRootUserId && t.RevokedAt == null)
             .ExecuteUpdateAsync(t => t
                 .SetProperty(token => token.RevokedAt, DateTime.UtcNow)
                 .SetProperty(token => token.TokenHash, (string?)null)
@@ -65,6 +63,10 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     public async Task AddAsync(RefreshToken token)
     {
         await  _context.RefreshTokens.AddAsync(token);
+    }
+
+    public async Task SaveChangesAsync()
+    {
         await _context.SaveChangesAsync();
     }
 }

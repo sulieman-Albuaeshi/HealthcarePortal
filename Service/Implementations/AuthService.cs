@@ -8,8 +8,9 @@ using Domain.Models;
 using Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
-
 using Repository.Interfaces;
+using Service.Utility;
+using BC = BCrypt.Net.BCrypt;
 
 namespace Service.Implementations;
 
@@ -37,12 +38,20 @@ public class AuthService : IAuthService
 
     private string GenerateJwtToken(User user)
     {
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role.ToString())
         };
+        if (user.Role == UserRole.PatientAndDoctor)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, nameof(UserRole.Patient)));
+            claims.Add(new Claim(ClaimTypes.Role, nameof(UserRole.Doctor)));
+        }
+        else
+        {
+            claims.Add(new Claim(ClaimTypes.Role, user.Role.ToString()));
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtSettings:Secret"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -51,7 +60,7 @@ public class AuthService : IAuthService
             issuer: _config["JwtSettings:Issuer"],
             audience: _config["JwtSettings:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(2),
+            expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -69,7 +78,7 @@ public class AuthService : IAuthService
     {
         var AccessToken = GenerateJwtToken(user);
         var refreshToken = GenerateRefreshToken();
-        var refreshTokenHash = BCrypt.Net.BCrypt.HashPassword(refreshToken);
+        var refreshTokenHash = TokenHasher.HashToken(refreshToken);
         var refreshTokenExpiryDays = Convert.ToInt32(_config["JwtSettings:RefreshTokenExpiryDays"]);
 
 
@@ -82,6 +91,7 @@ public class AuthService : IAuthService
         };
 
         await _refreshTokenRepository.AddAsync(refreshTokenEntity);
+        await _refreshTokenRepository.SaveChangesAsync();
 
         return new TokenDto
         {
@@ -93,7 +103,7 @@ public class AuthService : IAuthService
     {
         var user = await _userRepository.GetByEmailAsync(userLoginDto.Email);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(userLoginDto.Password, user.PasswordHash))
+        if (user == null || !BC.Verify(userLoginDto.Password, user.PasswordHash))
             throw new UnauthorizedAccessException("Invalid credentials");
             
         return await GenerateTokensForUserAsync(user);
@@ -106,36 +116,49 @@ public class AuthService : IAuthService
 
     public async Task<TokenDto?> RefreshToken(RefreshTokenRequestDto request)
     {
-        var oldRefreshTokenHash = await _refreshTokenRepository.GetByTokenHashAsync(BCrypt.Net.BCrypt.HashPassword(request.RefreshToken));
-
-        if (oldRefreshTokenHash == null)
+        var oldRefreshToken = await _refreshTokenRepository.GetByTokenHashAsync(TokenHasher.HashToken(request.RefreshToken));
+        
+        if (oldRefreshToken == null)
         {
             // LOG: Invalid refresh token attempt
             throw new UnauthorizedAccessException("Invalid refresh token");
         }
 
-        var refreshTokenExpiryDays = Convert.ToInt32(_config["JwtSettings:RefreshTokenExpiryDays"]);
-        var expiryTime = DateTime.UtcNow.AddDays(refreshTokenExpiryDays);
+        if(oldRefreshToken.User == null)
+            throw new UnauthorizedAccessException("User account is inactive or not found.");
 
-        string accessToken = GenerateJwtToken(oldRefreshTokenHash.User);
-        string RefreshToken = GenerateRefreshToken();
-        string newRefreshTokenHash = BCrypt.Net.BCrypt.HashPassword(RefreshToken);
+        if (oldRefreshToken.ExpiresAt < DateTime.UtcNow)
+            throw new UnauthorizedAccessException("Token expired.");
+
+        if (oldRefreshToken.RevokedAt != null)
+        {
+            // THEFT DETECTED: Revoke the entire token family!
+            await _refreshTokenRepository.RevokeTokenFamilyIfOld(oldRefreshToken.UserId);
+            await _refreshTokenRepository.SaveChangesAsync();
+            throw new UnauthorizedAccessException("Token reuse detected. All sessions revoked.");
+        }
+
+        string accessToken = GenerateJwtToken(oldRefreshToken.User);
+        string rawRefreshToken = GenerateRefreshToken();
+        string newRefreshTokenHash = TokenHasher.HashToken(rawRefreshToken);
+        var refreshTokenExpiryDays = Convert.ToInt32(_config["JwtSettings:RefreshTokenExpiryDays"]);
 
         var newRefreshTokenEntity = new RefreshToken
         {
-            UserId = oldRefreshTokenHash.UserId,
+            UserId = oldRefreshToken.UserId,
             TokenHash = newRefreshTokenHash,
-            ExpiresAt = expiryTime,
+            ExpiresAt = DateTime.UtcNow.AddDays(refreshTokenExpiryDays),
             CreatedAt = DateTime.UtcNow,
         };
 
         await _refreshTokenRepository.AddAsync(newRefreshTokenEntity);
-        await _refreshTokenRepository.RevokeTokenAsync(oldRefreshTokenHash.Id, newRefreshTokenEntity.Id);
+        await _refreshTokenRepository.RevokeTokenAsync(oldRefreshToken, newRefreshTokenEntity.Id);
+        await _refreshTokenRepository.SaveChangesAsync();
 
         return new TokenDto
         {
             AccessToken = accessToken,
-            RefreshToken = RefreshToken
+            RefreshToken = rawRefreshToken
         };
     }
 
@@ -147,7 +170,7 @@ public class AuthService : IAuthService
         // Hash the password
         if (existingUser == null)
         {
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);        
+            var passwordHash = BC.HashPassword(dto.Password);        
             // Create the user
             existingUser = new User
             {
@@ -163,6 +186,8 @@ public class AuthService : IAuthService
         {
             if (existingUser.Role == UserRole.Doctor)
             {
+                if (!BC.Verify(dto.Password, existingUser.PasswordHash))
+                    throw new UnauthorizedAccessException("invalid credentials");
                 existingUser.Role = UserRole.PatientAndDoctor;
                 await _userRepository.UpdateAsync(existingUser);
             }
@@ -176,7 +201,7 @@ public class AuthService : IAuthService
         // Create the patient profile
         var patientProfile = new PatientProfile
         {
-            UserId = existingUser.Id,
+            User = existingUser,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             DateOfBirth = dto.DateOfBirth,
@@ -198,7 +223,7 @@ public class AuthService : IAuthService
             return null;
 
         // Hash the password
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+        var passwordHash = BC.HashPassword(dto.Password);
 
         // Create the user
         var user = new User
@@ -215,7 +240,7 @@ public class AuthService : IAuthService
         // Create the doctor profile
         var doctorProfile = new DoctorProfile
         {
-            UserId = user.Id,
+            User = user,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Specialization = dto.Specialization,
