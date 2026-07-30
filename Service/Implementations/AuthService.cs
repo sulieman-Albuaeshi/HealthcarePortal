@@ -79,7 +79,7 @@ public class AuthService : IAuthService
         var AccessToken = GenerateJwtToken(user);
         var refreshToken = GenerateRefreshToken();
         var refreshTokenHash = TokenHasher.HashToken(refreshToken);
-        var refreshTokenExpiryDays = Convert.ToInt32(_config["JwtSettings:RefreshTokenExpiryDays"]);
+        var refreshTokenExpiryDays = Convert.ToInt32(_config["JwtSettings:RefreshTokenExpirationDays"]);
 
 
         var refreshTokenEntity = new RefreshToken
@@ -141,7 +141,7 @@ public class AuthService : IAuthService
         string accessToken = GenerateJwtToken(oldRefreshToken.User);
         string rawRefreshToken = GenerateRefreshToken();
         string newRefreshTokenHash = TokenHasher.HashToken(rawRefreshToken);
-        var refreshTokenExpiryDays = Convert.ToInt32(_config["JwtSettings:RefreshTokenExpiryDays"]);
+        var refreshTokenExpiryDays = Convert.ToInt32(_config["JwtSettings:RefreshTokenExpirationDays"]);
 
         var newRefreshTokenEntity = new RefreshToken
         {

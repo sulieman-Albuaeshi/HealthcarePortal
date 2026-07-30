@@ -11,10 +11,17 @@ using Service.Implementations;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using API.Authorization;
+using FluentValidation.AspNetCore;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+// 2. Enable automatic validation for controllers
+builder.Services.AddFluentValidationAutoValidation();
+
 
 // ==========================================
 // 1. CONFIGURE EF CORE
@@ -22,16 +29,11 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
     throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-
-var options = new DbContextOptionsBuilder<AppDbContext>()
-    .UseSqlServer(connectionString)
-    .LogTo(Console.WriteLine, LogLevel.Information)
-    .EnableSensitiveDataLogging()
-    .Options;
-
-
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString)
+    .LogTo(Console.WriteLine, LogLevel.Information)
+    .EnableSensitiveDataLogging());
+
 
 // ==========================================
 // 2. CONFIGURE DEPENDENCY INJECTION
@@ -50,6 +52,7 @@ builder.Services.AddScoped(typeof(IDoctorProfileService), typeof(DoctorProfileSe
 builder.Services.AddScoped(typeof(IPatientProfileService), typeof(PatientProfileService));
 builder.Services.AddScoped(typeof(IMedicalRecordService), typeof(MedicalRecordService));    
 builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
+builder.Services.AddScoped(typeof(IAuthService), typeof(AuthService));
 
 
 // ==========================================
@@ -155,3 +158,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
