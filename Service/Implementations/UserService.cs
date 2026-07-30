@@ -64,10 +64,4 @@ public class UserService : IUserService
         var user = await _userRepository.GetUserWithProfilesAsync(userId);
         return user?.ToDto();
     }
-
-    public async Task<UserDto?> GetUserByEmailAndPasswordAsync(string email, string passwordHash)
-    {
-        var user = await _userRepository.GetUserByEmailAndPassword(email, passwordHash);
-        return user?.ToDto();
-    }
 }

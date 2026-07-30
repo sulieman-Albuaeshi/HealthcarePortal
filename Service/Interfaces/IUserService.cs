@@ -11,5 +11,4 @@ public interface IUserService
     Task DeleteAsync(Guid id);
     Task<UserDto?> GetByEmailAsync(string email);
     Task<UserDto?> GetUserWithProfilesAsync(Guid userId);
-    Task<UserDto?> GetUserByEmailAndPasswordAsync(string email, string passwordHash);
 }

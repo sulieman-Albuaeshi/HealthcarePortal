@@ -49,7 +49,6 @@ builder.Services.AddScoped(typeof(IAuditLogService), typeof(AuditLogService));
 builder.Services.AddScoped(typeof(IDoctorProfileService), typeof(DoctorProfileService));
 builder.Services.AddScoped(typeof(IPatientProfileService), typeof(PatientProfileService));
 builder.Services.AddScoped(typeof(IMedicalRecordService), typeof(MedicalRecordService));    
-builder.Services.AddScoped(typeof(IRefreshTokenService), typeof(RefreshTokenService));
 builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
 
 
