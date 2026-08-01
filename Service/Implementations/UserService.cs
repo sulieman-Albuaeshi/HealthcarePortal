@@ -30,6 +30,7 @@ public class UserService : IUserService
     public async Task<UserDto> CreateAsync(CreateUserDto dto)
     {
         var entity = dto.ToEntity();
+        entity.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.PasswordHash);
         await _userRepository.AddAsync(entity);
         await _userRepository.SaveChangesAsync();
         return entity.ToDto();

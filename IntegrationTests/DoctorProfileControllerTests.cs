@@ -438,4 +438,37 @@ public class DoctorProfileControllerTests : IClassFixture<CustomWebApplicationFa
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
+
+    // ==================== GetWithAppointments Tests ====================
+    [Fact]
+    public async Task GetWithAppointments_AsProfileOwner_ReturnsOkWithAppointments()
+    {
+        // Arrange
+        var (doctorToken, doctorProfile) = await CreateDoctorAndGetProfile("doc_get_appointments_owner@test.com");
+        var client = _utilityTest.CreateAuthenticatedClient(doctorToken);
+
+        // Act
+        var response = await client.GetAsync($"/api/DoctorProfiles/{doctorProfile.Id}/appointments");
+        var appointments = await response.Content.ReadFromJsonAsync<DoctorWithAppointmentDto>();
+        appointments.Should().NotBeNull();
+        appointments.Appointments.Should().NotBeNull();
+        appointments.Appointments.Should().BeEmpty(); // Assuming no appointments yet
+    }
+
+    // ==================== GetWithMedicalRecords Tests ====================
+    [Fact]
+    public async Task GetWithMedicalRecords_AsProfileOwner_ReturnsOkWithMedicalRecords()
+    {
+        // Arrange
+        var (doctorToken, doctorProfile) = await CreateDoctorAndGetProfile("doc_get_medicalrecords_owner@test.com");
+        var client = _utilityTest.CreateAuthenticatedClient(doctorToken);
+
+        // Act
+        var response = await client.GetAsync($"/api/DoctorProfiles/{doctorProfile.Id}/Medical-records"); 
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var medicalRecords = await response.Content.ReadFromJsonAsync<DoctorWithMedicalRecordDto>();
+        medicalRecords.Should().NotBeNull();
+        medicalRecords.MedicalRecords.Should().NotBeNull();
+        medicalRecords.MedicalRecords.Should().BeEmpty(); // Assuming no medical records yet
+    }
 }

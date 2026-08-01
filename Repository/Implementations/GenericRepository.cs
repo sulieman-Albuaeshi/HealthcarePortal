@@ -66,6 +66,8 @@ public abstract class GenericRepository<T> : IGenericRepository<T> where T : cla
         var entity = await GetByIdAsync(id);
         if (entity != null)
             await DeleteAsync(entity);
+        else
+            throw new KeyNotFoundException($"Entity with id {id} not found.");
     }
 
     public async Task<int> SaveChangesAsync()

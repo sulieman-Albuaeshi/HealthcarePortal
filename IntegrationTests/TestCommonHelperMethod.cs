@@ -98,7 +98,7 @@ public class UtilityTest
         var response = await client.PostAsJsonAsync("/api/Users/create", new CreateUserDto
         {
             Email = email,
-            PasswordHash = passwordHash,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(passwordHash),
             Role = role
         });
 

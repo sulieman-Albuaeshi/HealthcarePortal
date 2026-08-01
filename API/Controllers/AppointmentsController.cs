@@ -46,7 +46,7 @@ public class AppointmentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<AppointmentDto>> GetById(Guid id)
     {
-        var appointment = await _appointmentService.GetByIdAsync(id);
+        var appointment = await _appointmentService.GetByIdWithDoctorAndPatientAsync(id);
 
         if (appointment == null)
             return NotFound();
@@ -88,7 +88,7 @@ public class AppointmentsController : ControllerBase
         
         dto.Id = id;
 
-        var existingAppointment = await _appointmentService.GetByIdAsync(id);
+        var existingAppointment = await _appointmentService.GetByIdWithDoctorAndPatientAsync(id);
         if (existingAppointment == null)
             return NotFound();  
 
@@ -117,7 +117,7 @@ public class AppointmentsController : ControllerBase
         if (id == Guid.Empty)
             return BadRequest("Invalid appointment ID");
 
-        var existing = await _appointmentService.GetByIdAsync(id);
+        var existing = await _appointmentService.GetByIdWithDoctorAndPatientAsync(id);
         if (existing == null)
             return NotFound();
 
@@ -140,6 +140,12 @@ public class AppointmentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetByPatient(Guid patientId)
     {
+        var authPatientResult = await _authorizationService.AuthorizeAsync(
+            User, patientId, new OwnResourceRequirement());
+
+        if (!authPatientResult.Succeeded)
+            return Forbid();
+
         var appointments = await _appointmentService.GetByPatientIdAsync(patientId);
         return Ok(appointments);
     }
@@ -153,6 +159,12 @@ public class AppointmentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetByDoctor(Guid doctorId)
     {
+        var authDoctorResult = await _authorizationService.AuthorizeAsync(
+            User, doctorId, new OwnResourceRequirement());
+
+        if (!authDoctorResult.Succeeded)
+            return Forbid();
+
         var appointments = await _appointmentService.GetByDoctorIdAsync(doctorId);
         return Ok(appointments);
     }

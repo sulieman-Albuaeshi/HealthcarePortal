@@ -209,7 +209,7 @@ public class UserControllerTests : IClassFixture<CustomWebApplicationFactory>
         {
             Email = "user_create_invalid_role@test.com",
             PasswordHash = "Password123!",
-            Role = (UserRole)999 // Invalid role
+            Role = (UserRole)byte.MaxValue // Invalid role
         });
 
         // Assert

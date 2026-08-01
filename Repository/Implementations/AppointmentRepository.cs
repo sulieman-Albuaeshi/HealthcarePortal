@@ -46,4 +46,12 @@ public class AppointmentRepository : GenericRepository<Appointment>, IAppointmen
             .Include(a => a.Patient)
             .ToListAsync();
     }
+
+    public async Task<Appointment?> GetByIdWithDoctorAndPatientAsync(Guid id)
+    {
+        return await _dbSet
+            .Include(a => a.Doctor)
+            .Include(a => a.Patient)
+            .FirstOrDefaultAsync(a => a.Id == id);
+    } 
 }
