@@ -10,6 +10,7 @@ using Service.Interfaces;
 using Service.Implementations;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using API.Middleware;
 using API.Authorization;
 using FluentValidation.AspNetCore;
 
@@ -142,6 +143,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddSingleton<IAuthorizationHandler, OwnResourceHandler>();
 
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
