@@ -49,14 +49,11 @@ public class PatientProfilesController : ControllerBase
         if (profile == null)
             return NotFound();
 
+        // Any Doctor can view any patient profile.
         if (User.IsInRole("Doctor"))
             return Ok(profile);
 
-        var userId = await _patientProfileService.GetUserIDByPatientIdAsync(id);
-        if (userId == Guid.Empty)
-            return NotFound();
-
-        var authResult = await _authorizationService.AuthorizeAsync(User, userId, new OwnResourceRequirement());
+        var authResult = await _authorizationService.AuthorizeAsync(User, id, new OwnResourceRequirement());
         if (!authResult.Succeeded)
             return Forbid();
 
@@ -88,12 +85,7 @@ public class PatientProfilesController : ControllerBase
             return BadRequest("Invalid patient profile ID");
 
         dto.Id = id;
-
-        var userId = await _patientProfileService.GetUserIDByPatientIdAsync(id);
-        if (userId == Guid.Empty)
-            return NotFound();
-
-        var authResult = await _authorizationService.AuthorizeAsync(User, userId, new OwnResourceRequirement());
+        var authResult = await _authorizationService.AuthorizeAsync(User, id, new OwnResourceRequirement());
         if (!authResult.Succeeded)
             return Forbid();
 
@@ -116,11 +108,7 @@ public class PatientProfilesController : ControllerBase
         if (id == Guid.Empty)
             return BadRequest("Invalid patient profile ID");
 
-        var userId = await _patientProfileService.GetUserIDByPatientIdAsync(id);
-        if (userId == Guid.Empty)
-            return NotFound();
-
-        var authResult = await _authorizationService.AuthorizeAsync(User, userId, new OwnResourceRequirement());
+        var authResult = await _authorizationService.AuthorizeAsync(User, id, new OwnResourceRequirement());
         if (!authResult.Succeeded)
             return Forbid();
 
@@ -140,8 +128,7 @@ public class PatientProfilesController : ControllerBase
         if (profileWithAppointments == null) 
             return NotFound();
 
-        var userId = await _patientProfileService.GetUserIDByPatientIdAsync(id);
-        var authResult = await _authorizationService.AuthorizeAsync(User, userId, new OwnResourceRequirement());
+        var authResult = await _authorizationService.AuthorizeAsync(User, id, new OwnResourceRequirement());
         if (!authResult.Succeeded) return Forbid();
 
         return Ok(profileWithAppointments);
@@ -158,8 +145,7 @@ public class PatientProfilesController : ControllerBase
         var profileWithMedicalRecords = await _patientProfileService.GetWithMedicalRecordsAsync(id);
         if (profileWithMedicalRecords == null) return NotFound();
 
-        var userId = await _patientProfileService.GetUserIDByPatientIdAsync(id);
-        var authResult = await _authorizationService.AuthorizeAsync(User, userId, new OwnResourceRequirement());
+        var authResult = await _authorizationService.AuthorizeAsync(User, id, new OwnResourceRequirement());
         if (!authResult.Succeeded) return Forbid();
 
         return Ok(profileWithMedicalRecords);

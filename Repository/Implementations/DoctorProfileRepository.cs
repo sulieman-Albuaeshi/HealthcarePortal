@@ -11,11 +11,6 @@ public class DoctorProfileRepository : GenericRepository<DoctorProfile>, IDoctor
     {
     }
 
-    public async Task<DoctorProfile?> GetByUserIdAsync(Guid userId)
-    {
-       return await _dbSet.FirstOrDefaultAsync(d => d.UserId == userId);
-    }
-
     public async Task<DoctorProfile?> GetWithAppointmentsAsync(Guid id)
     {
         return await _dbSet
@@ -35,15 +30,5 @@ public class DoctorProfileRepository : GenericRepository<DoctorProfile>, IDoctor
         return await _dbSet
             .Where(d => d.Specialization == specialization)
             .ToListAsync();
-    }
-
-    public async Task<Guid> GetUserIDByDoctorIdAsync(Guid doctorProfileId)
-    {
-        var doctorProfile = await _dbSet.FirstOrDefaultAsync(d => d.Id == doctorProfileId);
-        if (doctorProfile == null)
-        {
-            throw new KeyNotFoundException($"Doctor profile with ID {doctorProfileId} not found.");
-        }
-        return doctorProfile.UserId;
     }
 }

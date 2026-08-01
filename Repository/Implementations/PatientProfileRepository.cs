@@ -11,11 +11,6 @@ public class PatientProfileRepository : GenericRepository<PatientProfile>, IPati
     {
     }
 
-    public async Task<PatientProfile?> GetByUserIdAsync(Guid userId)
-    {
-        return await _dbSet.FirstOrDefaultAsync(p => p.UserId == userId);
-    }
-
     public async Task<PatientProfile?> GetWithAppointmentsAsync(Guid id)
     {
         return await _dbSet
@@ -28,15 +23,5 @@ public class PatientProfileRepository : GenericRepository<PatientProfile>, IPati
         return await _dbSet
             .Include(p => p.MedicalRecords)
             .FirstOrDefaultAsync(p => p.Id == id);
-    }
-
-    public async Task<Guid> GetUserIDByPatientIdAsync(Guid patientProfileId)
-    {
-        var patientProfile = await _dbSet.FirstOrDefaultAsync(p => p.Id == patientProfileId);
-        if (patientProfile == null)
-        {
-            throw new KeyNotFoundException($"Patient profile with ID {patientProfileId} not found.");
-        }
-        return patientProfile.UserId;
     }
 }

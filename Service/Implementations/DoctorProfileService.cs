@@ -51,13 +51,6 @@ public class DoctorProfileService : IDoctorProfileService
         await _doctorProfileRepository.DeleteAsync(id);
         await _doctorProfileRepository.SaveChangesAsync();
     }
-
-    public async Task<DoctorProfileDto?> GetByUserIdAsync(Guid userId)
-    {
-        var profile = await _doctorProfileRepository.GetByUserIdAsync(userId);
-        return profile?.ToDto();
-    }
-
     public async Task<DoctorWithAppointmentDto?> GetWithAppointmentsAsync(Guid id)
     {
         var profile = await _doctorProfileRepository.GetWithAppointmentsAsync(id);
@@ -74,10 +67,5 @@ public class DoctorProfileService : IDoctorProfileService
     {
         var profiles = await _doctorProfileRepository.GetBySpecializationAsync(specialization);
         return profiles.Select(p => p.ToDto());
-    }
-
-    public async Task<Guid> GetUserIDByDoctorIdAsync(Guid doctorProfileId)
-    {
-        return await _doctorProfileRepository.GetUserIDByDoctorIdAsync(doctorProfileId);
     }
 }

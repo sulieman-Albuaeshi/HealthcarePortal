@@ -78,11 +78,7 @@ public class DoctorProfilesController : ControllerBase
 
         dto.Id = id;
 
-        var userId = await _doctorService.GetUserIDByDoctorIdAsync(id);
-        if (userId == Guid.Empty)
-            return NotFound();
-
-        var authResult = await _authorizationService.AuthorizeAsync(User, userId, new OwnResourceRequirement());
+        var authResult = await _authorizationService.AuthorizeAsync(User, dto.Id, new OwnResourceRequirement());
         if (!authResult.Succeeded)
             return Forbid();
         
@@ -106,11 +102,7 @@ public class DoctorProfilesController : ControllerBase
         if (id == Guid.Empty)
             return BadRequest("Invalid doctor profile ID");
 
-        var userId = await _doctorService.GetUserIDByDoctorIdAsync(id);
-        if (userId == Guid.Empty)
-            return NotFound();
-
-        var authResult = await _authorizationService.AuthorizeAsync(User, userId, new OwnResourceRequirement());
+        var authResult = await _authorizationService.AuthorizeAsync(User, id, new OwnResourceRequirement());
         if (!authResult.Succeeded)
             return Forbid();
 
@@ -144,11 +136,7 @@ public class DoctorProfilesController : ControllerBase
         if (id == Guid.Empty)
             return BadRequest("Invalid doctor profile ID");
 
-        var userId = await _doctorService.GetUserIDByDoctorIdAsync(id);
-        if (userId == Guid.Empty)
-            return NotFound();
-
-        var authResult = await _authorizationService.AuthorizeAsync(User, userId, new OwnResourceRequirement());
+        var authResult = await _authorizationService.AuthorizeAsync(User, id, new OwnResourceRequirement());
         if (!authResult.Succeeded)
             return Forbid();
 
@@ -160,7 +148,7 @@ public class DoctorProfilesController : ControllerBase
         return Ok(profileWithAppointments);
     }
 
-    [HttpGet("{id:guid}/MedicalRecords")]
+    [HttpGet("{id:guid}/Medical-records")]
     [Authorize(Roles = "Admin,Doctor")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -172,11 +160,7 @@ public class DoctorProfilesController : ControllerBase
         if (id == Guid.Empty)
             return BadRequest("Invalid doctor profile ID");
 
-        var userId = await _doctorService.GetUserIDByDoctorIdAsync(id);
-        if (userId == Guid.Empty)
-            return NotFound();
-
-        var authResult = await _authorizationService.AuthorizeAsync(User, userId, new OwnResourceRequirement());
+        var authResult = await _authorizationService.AuthorizeAsync(User, id, new OwnResourceRequirement());
         if (!authResult.Succeeded)
             return Forbid();
 

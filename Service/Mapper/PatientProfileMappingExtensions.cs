@@ -48,7 +48,7 @@ public static class PatientProfileMappingExtensions
     {
         return new PatientProfile
         {
-            UserId = dto.UserId,
+            Id = dto.Id,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             DateOfBirth = dto.DateOfBirth,

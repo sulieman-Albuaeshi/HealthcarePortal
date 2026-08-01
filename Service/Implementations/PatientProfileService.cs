@@ -52,12 +52,6 @@ public class PatientProfileService : IPatientProfileService
         await _patientProfileRepository.SaveChangesAsync();
     }
 
-    public async Task<PatientProfileDto?> GetByUserIdAsync(Guid userId)
-    {
-        var profile = await _patientProfileRepository.GetByUserIdAsync(userId);
-        return profile?.ToDto();
-    }
-
     public async Task<PatientWithAppointmentsDto?> GetWithAppointmentsAsync(Guid id)
     {
         var profile = await _patientProfileRepository.GetWithAppointmentsAsync(id);
@@ -70,8 +64,4 @@ public class PatientProfileService : IPatientProfileService
         return profile?.ToPatientWithMedicalRecordDto();
     }
 
-    public async Task<Guid> GetUserIDByPatientIdAsync(Guid patientProfileId)
-    {
-        return await _patientProfileRepository.GetUserIDByPatientIdAsync(patientProfileId);
-    }
 }

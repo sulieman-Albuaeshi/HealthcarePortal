@@ -17,19 +17,12 @@ public class MedicalRecordsController : ControllerBase
 {
     private readonly IMedicalRecordService _medicalRecordService;
     private readonly IAuthorizationService _authorizationService;
-    private readonly IPatientProfileService _patientProfileService;
-    private readonly IDoctorProfileService _doctorProfileService;
-
     public MedicalRecordsController(
         IMedicalRecordService medicalRecordService,
-        IAuthorizationService authorizationService,
-        IPatientProfileService patientProfileService,
-        IDoctorProfileService doctorProfileService)
+        IAuthorizationService authorizationService)
     {
         _medicalRecordService = medicalRecordService;
         _authorizationService = authorizationService;
-        _patientProfileService = patientProfileService;
-        _doctorProfileService = doctorProfileService;
     }
 
     [HttpGet]
@@ -85,8 +78,7 @@ public class MedicalRecordsController : ControllerBase
     {
         if (User.IsInRole("Doctor") && dto.DoctorId.HasValue)
         {
-            var doctorUserId = await _doctorProfileService.GetUserIDByDoctorIdAsync(dto.DoctorId.Value);
-            var authResult = await _authorizationService.AuthorizeAsync(User, doctorUserId, new OwnResourceRequirement());
+            var authResult = await _authorizationService.AuthorizeAsync(User, dto.DoctorId.Value, new OwnResourceRequirement());
             if (!authResult.Succeeded)
                 return Forbid();
         }
@@ -112,8 +104,7 @@ public class MedicalRecordsController : ControllerBase
 
         if (existingRecord.Doctor != null)
         {
-            var doctorUserId = await _doctorProfileService.GetUserIDByDoctorIdAsync(existingRecord.Doctor.Id);
-            var authResult = await _authorizationService.AuthorizeAsync(User, doctorUserId, new OwnResourceRequirement());
+            var authResult = await _authorizationService.AuthorizeAsync(User, existingRecord.Doctor.Id, new OwnResourceRequirement());
             if (!authResult.Succeeded)
                 return Forbid();
         }
@@ -136,8 +127,7 @@ public class MedicalRecordsController : ControllerBase
 
         if (existingRecord.Doctor != null)
         {
-            var doctorUserId = await _doctorProfileService.GetUserIDByDoctorIdAsync(existingRecord.Doctor.Id);
-            var authResult = await _authorizationService.AuthorizeAsync(User, doctorUserId, new OwnResourceRequirement());
+            var authResult = await _authorizationService.AuthorizeAsync(User, existingRecord.Doctor.Id, new OwnResourceRequirement());
             if (!authResult.Succeeded)
                 return Forbid();
         }
@@ -155,8 +145,7 @@ public class MedicalRecordsController : ControllerBase
     {
         if (User.IsInRole("Patient"))
         {
-            var userId = await _patientProfileService.GetUserIDByPatientIdAsync(patientId);
-            var authResult = await _authorizationService.AuthorizeAsync(User, userId, new OwnResourceRequirement());
+            var authResult = await _authorizationService.AuthorizeAsync(User, patientId, new OwnResourceRequirement());
             if (!authResult.Succeeded)
                 return Forbid();
         }
@@ -172,8 +161,7 @@ public class MedicalRecordsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<IEnumerable<MedicalRecordDto>>> GetByDoctorId(Guid doctorId)
     {
-        var doctorUserId = await _doctorProfileService.GetUserIDByDoctorIdAsync(doctorId);
-        var authResult = await _authorizationService.AuthorizeAsync(User, doctorUserId, new OwnResourceRequirement());
+        var authResult = await _authorizationService.AuthorizeAsync(User, doctorId, new OwnResourceRequirement());
         if (!authResult.Succeeded)
             return Forbid();
 

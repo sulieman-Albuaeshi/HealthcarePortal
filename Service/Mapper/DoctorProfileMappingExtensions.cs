@@ -20,8 +20,8 @@ public static class DoctorProfileMappingExtensions
     public static DoctorProfile ToEntity(this CreateDoctorProfileDto dto)
     {
         return new DoctorProfile
-        {
-            UserId = dto.UserId,
+        {   
+            Id = dto.Id, 
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Specialization = dto.Specialization,

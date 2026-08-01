@@ -169,7 +169,7 @@ public class PatientProfileControllerTests : IClassFixture<CustomWebApplicationF
         // Act
         var response = await client.PostAsJsonAsync("/api/PatientProfiles/create", new CreatePatientProfileDto
         {
-            UserId = createdUser.Id,
+            Id = createdUser.Id,
             FirstName = "Alice",
             LastName = "Wonderland",
             DateOfBirth = new DateOnly(1995, 3, 15),
@@ -200,7 +200,7 @@ public class PatientProfileControllerTests : IClassFixture<CustomWebApplicationF
         // Act
         var response = await client.PostAsJsonAsync("/api/PatientProfiles/create", new CreatePatientProfileDto
         {
-            UserId = createdUser.Id,
+            Id = createdUser.Id,
             FirstName = "",
             LastName = "Wonderland",
             DateOfBirth = new DateOnly(1995, 3, 15),
@@ -226,7 +226,7 @@ public class PatientProfileControllerTests : IClassFixture<CustomWebApplicationF
         // Act
         var response = await client.PostAsJsonAsync("/api/PatientProfiles/create", new CreatePatientProfileDto
         {
-            UserId = createdUser.Id,
+            Id = createdUser.Id,
             FirstName = "Alice",
             LastName = "Wonderland",
             DateOfBirth = DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
@@ -249,7 +249,7 @@ public class PatientProfileControllerTests : IClassFixture<CustomWebApplicationF
         // Act
         var response = await client.PostAsJsonAsync("/api/PatientProfiles/create", new CreatePatientProfileDto
         {
-            UserId = Guid.Empty,
+            Id = Guid.Empty,
             FirstName = "Alice",
             LastName = "Wonderland",
             DateOfBirth = new DateOnly(1995, 3, 15),
@@ -268,7 +268,7 @@ public class PatientProfileControllerTests : IClassFixture<CustomWebApplicationF
         var client = _factory.CreateClient();
         var response = await client.PostAsJsonAsync("/api/PatientProfiles/create", new CreatePatientProfileDto
         {
-            UserId = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             FirstName = "Alice",
             LastName = "Wonderland",
             DateOfBirth = new DateOnly(1995, 3, 15),
@@ -291,7 +291,7 @@ public class PatientProfileControllerTests : IClassFixture<CustomWebApplicationF
         // Act
         var response = await client.PostAsJsonAsync("/api/PatientProfiles/create", new CreatePatientProfileDto
         {
-            UserId = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             FirstName = "Alice",
             LastName = "Wonderland",
             DateOfBirth = new DateOnly(1995, 3, 15),

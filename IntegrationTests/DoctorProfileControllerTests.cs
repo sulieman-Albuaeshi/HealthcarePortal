@@ -128,7 +128,7 @@ public class DoctorProfileControllerTests : IClassFixture<CustomWebApplicationFa
         var client = _utilityTest.CreateAuthenticatedClient(adminToken);
         var createDto = new CreateDoctorProfileDto
         {
-            UserId = userToBecomeDoctor.Id,
+            Id = userToBecomeDoctor.Id,
             FirstName = "Gregory",
             LastName = "House",
             Specialization = "Nephrology",
@@ -159,7 +159,7 @@ public class DoctorProfileControllerTests : IClassFixture<CustomWebApplicationFa
         var client = _utilityTest.CreateAuthenticatedClient(adminToken);
         var createDto = new CreateDoctorProfileDto
         {
-            UserId = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             FirstName = "", // Invalid
             LastName = "House",
             Specialization = "Nephrology",
@@ -192,7 +192,7 @@ public class DoctorProfileControllerTests : IClassFixture<CustomWebApplicationFa
 
         var createDto = new CreateDoctorProfileDto
         {
-            UserId = doctorUser.Id, // User already has a profile
+            Id = doctorUser.Id, // User already has a profile
             FirstName = "Another",
             LastName = "Profile",
             Specialization = "Dermatology",
@@ -216,7 +216,7 @@ public class DoctorProfileControllerTests : IClassFixture<CustomWebApplicationFa
         var client = _utilityTest.CreateAuthenticatedClient(patientToken);
         var createDto = new CreateDoctorProfileDto
         {
-            UserId = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             FirstName = "Gregory",
             LastName = "House",
             Specialization = "Nephrology",
@@ -235,7 +235,7 @@ public class DoctorProfileControllerTests : IClassFixture<CustomWebApplicationFa
     {
         // Arrange
         var client = _factory.CreateClient();
-        var createDto = new CreateDoctorProfileDto { UserId = Guid.NewGuid() };
+        var createDto = new CreateDoctorProfileDto { Id = Guid.NewGuid() };
 
         // Act
         var response = await client.PostAsJsonAsync("/api/DoctorProfiles/create", createDto);

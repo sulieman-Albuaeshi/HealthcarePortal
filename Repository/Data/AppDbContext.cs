@@ -79,16 +79,13 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<DoctorProfile>(entity =>
         {
-            entity.HasIndex(e => e.UserId, "UQ_DoctorProfiles_UserId").IsUnique();
-
-            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.FirstName).HasMaxLength(100);
             entity.Property(e => e.LastName).HasMaxLength(100);
             entity.Property(e => e.LicenseNumber).HasMaxLength(50);
             entity.Property(e => e.Specialization).HasMaxLength(100);
 
             entity.HasOne(d => d.User).WithOne(p => p.DoctorProfile)
-                .HasForeignKey<DoctorProfile>(d => d.UserId)
+                .HasForeignKey<DoctorProfile>(d => d.Id)
                 .OnDelete(DeleteBehavior.ClientSetNull);
             entity.HasQueryFilter(e => !e.IsDeleted);
         });
@@ -113,8 +110,6 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<PatientProfile>(entity =>
         {
-            entity.HasIndex(e => e.UserId, "UQ_PatientProfiles_UserId").IsUnique();
-
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.EmergencyContact).HasMaxLength(250);
             entity.Property(e => e.FirstName).HasMaxLength(100);
@@ -122,7 +117,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PhoneNumber).HasMaxLength(20);
 
             entity.HasOne(d => d.User).WithOne(p => p.PatientProfile)
-                .HasForeignKey<PatientProfile>(d => d.UserId)
+                .HasForeignKey<PatientProfile>(d => d.Id)
                 .OnDelete(DeleteBehavior.ClientSetNull);
             entity.HasQueryFilter(e => !e.IsDeleted);
 

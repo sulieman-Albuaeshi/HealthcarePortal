@@ -73,4 +73,10 @@ public class AppointmentService :  IAppointmentService
         var appointments = await _appointmentRepository.GetUpcomingAppointmentsAsync();
         return appointments.Select(a => a.ToDto());
     }
+
+    public async Task<AppointmentDto?> GetByIdWithDoctorAndPatientAsync(Guid id)
+    {
+        var appointment = await _appointmentRepository.GetByIdWithDoctorAndPatientAsync(id);
+        return appointment?.ToDto();
+    }
 }

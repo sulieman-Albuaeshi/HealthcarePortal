@@ -7,7 +7,7 @@ public class CreatePatientProfileDtoValidator : AbstractValidator<CreatePatientP
 {
     public CreatePatientProfileDtoValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.Id)
             .NotEqual(Guid.Empty).WithMessage("User ID is required");
 
         RuleFor(x => x.FirstName)
