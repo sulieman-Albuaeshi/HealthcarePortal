@@ -42,7 +42,7 @@ public class DoctorProfileRepository : GenericRepository<DoctorProfile>, IDoctor
         var doctorProfile = await _dbSet.FirstOrDefaultAsync(d => d.Id == doctorProfileId);
         if (doctorProfile == null)
         {
-            throw new InvalidOperationException($"Doctor profile with ID {doctorProfileId} not found.");
+            throw new KeyNotFoundException($"Doctor profile with ID {doctorProfileId} not found.");
         }
         return doctorProfile.UserId;
     }
