@@ -8,5 +8,4 @@ public class CreateDoctorProfileDto
     public string LastName { get; set; } = null!;
     public string Specialization { get; set; } = null!;
     public string LicenseNumber { get; set; } = null!;
-    public CreateUserDto user { get; set; } = null!;
 }

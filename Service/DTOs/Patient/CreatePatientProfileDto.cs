@@ -8,5 +8,4 @@ public class CreatePatientProfileDto
     public DateOnly DateOfBirth { get; set; }
     public string? PhoneNumber { get; set; }
     public string? EmergencyContact { get; set; }
-    public CreateUserDto user { get; set; } = null!;
 }

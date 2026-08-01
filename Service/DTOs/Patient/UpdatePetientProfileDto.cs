@@ -9,6 +9,4 @@ public class UpdatePatientProfileDto
     public string? PhoneNumber { get; set; }
     public string? EmergencyContact { get; set; }
     public bool IsDeleted { get; set; }
-    public UpdateUserDto user { get; set; } = null!;
-
 }
